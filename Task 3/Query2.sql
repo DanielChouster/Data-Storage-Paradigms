@@ -1,0 +1,25 @@
+-- The same as query 1, but retrieve the average number of lessons per month during the entire year, instead of the total for each month.
+
+-- This query is for the year 2022. To change year, replace "2022" with another value.
+
+SELECT ROUND(SUM(q.ALL_LESSONS)/12,2) AS AVERAGE_ALL,
+ROUND(SUM(q1.INDIVIDUAL_LESSONS)/12,2) AS INDIVIDUAL_LESSONS,
+ROUND(SUM(q2.ENSEMBLE_LESSONS)/12,2) AS ENSEMBLE_LESSONS,
+ROUND(SUM(q3.GROUP_LESSONS)/12,2) AS GROUP_LESSONS
+FROM 
+(SELECT COUNT(lesson_id) AS ALL_LESSONS,MONTH FROM lesson_view WHERE EXTRACT(YEAR FROM start_time)=2022 GROUP BY MONTH) q
+
+FULL OUTER JOIN (
+SELECT COUNT(lesson_id) AS INDIVIDUAL_LESSONS ,MONTH FROM lesson_view 
+WHERE EXTRACT(YEAR FROM start_time)=2022 AND TYPE='Individual' GROUP BY MONTH
+) q1 ON q1.MONTH=q.MONTH
+
+FULL OUTER JOIN (
+SELECT COUNT(lesson_id) AS ENSEMBLE_LESSONS,MONTH FROM lesson_view 
+WHERE EXTRACT(YEAR FROM start_time)=2022 AND TYPE='Ensemble' GROUP BY MONTH
+) q2 ON q2.MONTH=q.MONTH
+
+FULL OUTER JOIN (
+SELECT COUNT(lesson_id) AS GROUP_LESSONS,MONTH FROM lesson_view 
+WHERE EXTRACT(YEAR FROM start_time)=2022 AND TYPE='Group' GROUP BY MONTH
+) q3 ON q3.MONTH=q.MONTH
